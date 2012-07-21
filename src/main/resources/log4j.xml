@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{HH:mm:ss} %p [%t] %c{1}.%M(%L) | %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="IMG_DOWNLOADER" class="org.apache.log4j.RollingFileAppender">
+		<param name="MaxFileSize" value="100MB" />
+		<param name="File" value="./log/imgdownloader.log" />
+		<param name="Threshold" value="Debug" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d{dd-MMM-yyyy HH:mm:ss} %p [%t] %c{1}.%M(%L) | %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="net.sf.ehcache">
+		<level value="ERROR" />
+	</logger>
+
+	<!-- Suppress success logging from InteractiveAuthenticationSuccessEvent -->
+	<logger name="org.springframework.security">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="org.apache">
+		<level value="WARN" />
+	</logger>
+
+	<logger name="org.apache.velocity">
+		<level value="FATAL" />
+	</logger>
+
+	<logger name="org.hibernate">
+		<level value="INFO" />
+	</logger>
+
+	<!--logger name="org.hibernate.SQL"> <level value="DEBUG"/> </logger -->
+
+	<logger name="org.springframework">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="com.cjavellana">
+		<level value="DEBUG" />
+	</logger>
+
+	<logger name="com.gargoylesoftware">
+		<level value="INFO" />
+	</logger>
+
+	<root>
+		<level value="DEBUG" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="IMG_DOWNLOADER" />
+
+	</root>
+
+</log4j:configuration>
