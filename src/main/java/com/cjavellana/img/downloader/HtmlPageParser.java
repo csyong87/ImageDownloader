@@ -2,14 +2,16 @@ package com.cjavellana.img.downloader;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cjavellana.img.downloader.consumer.ImageUrlConsumer;
-import com.cjavellana.img.downloader.processor.ImageUrlProducer;
-import com.cjavellana.img.downloader.processor.ImageUrlProducerParameter;
+import com.cjavellana.img.downloader.db.ImgMetadataDatabase;
+import com.cjavellana.img.downloader.producer.ImageUrlProducer;
+import com.cjavellana.img.downloader.producer.ImageUrlProducerParameter;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -68,26 +70,26 @@ public class HtmlPageParser {
 
 			// Currently, only one producer is supported. Having multiple
 			// producer will mess up the task pool
-			pool.submit(new ImageUrlProducer(param, mediator));
+			Future<?> producerFuture = pool.submit(new ImageUrlProducer(param,
+					mediator));
 
 			logger.info(String.format("Initializing Consumers."));
 
+			ImgMetadataDatabase imgDatabase = new ImgMetadataDatabase(
+					destination);
+
 			// initialize our consumers
 			for (int i = 0; i < MAX_CONSUMER_COUNT; i++) {
-				pool.submit(new ImageUrlConsumer(mediator, destination));
+				pool.submit(new ImageUrlConsumer(mediator, imgDatabase));
 			}
 
-			while (mediator.isHasMoreTask()) {
-				// we have not received the 'shutdown' flag yet, suspend current
-				// thread for a little while
-				Thread.sleep(100);
-			}
+			producerFuture.get();
 
 			logger.info(String
 					.format("Producer stopped producing, placing poison pill into the task queue"));
 
 			// Producer has stopped producing task, poison the task queue to
-			// make consumers shut down.
+			// make shut down consumers.
 
 			// Since we have MAX_CONSUMER_COUNT and each consumer would have
 			// popped the task, insert MAX_CONSUMER_COUNT of poison pills into
@@ -98,9 +100,12 @@ public class HtmlPageParser {
 
 			logger.info(String.format("Shutting down task pool"));
 
-			pool.shutdown();
+			// clean up; Shutdown task pool, web client and store img database
+			// to disk
 
+			pool.shutdown();
 			webClient.closeAllWindows();
+			imgDatabase.persistToDisk();
 
 			for (String url : mediator.getBackingQueue()) {
 				logger.info(String.format("Image at: %s", url));
