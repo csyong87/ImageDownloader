@@ -10,23 +10,24 @@ import org.apache.commons.logging.LogFactory;
 
 import com.cjavellana.img.downloader.consumer.ImageUrlConsumer;
 import com.cjavellana.img.downloader.db.ImgMetadataDatabase;
+import com.cjavellana.img.downloader.html.HtmlPageParser;
+import com.cjavellana.img.downloader.mediator.MessageMediator;
 import com.cjavellana.img.downloader.producer.ImageUrlProducer;
-import com.cjavellana.img.downloader.producer.ImageUrlProducerParameter;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
- * This class processes a extracts all img tags from a given url to build a
- * shared task pool which feeds the consumer threads
+ * <p>
+ * The class the binds the {@link HtmlPageParser}, {@link ImageUrlProducer} and
+ * {@link ImageUrlConsumer} together
+ * </p>
  * 
  * @author Christian
  * 
  */
-public class HtmlPageParser {
+public class ImageDownloadManager {
 
-	private static final Log logger = LogFactory.getLog(HtmlPageParser.class);
+	private static final Log logger = LogFactory
+			.getLog(ImageDownloadManager.class);
 
 	/**
 	 * Max of 50 image downloader and resizer workers
@@ -37,59 +38,49 @@ public class HtmlPageParser {
 
 	private static final int MAX_CONSUMER_COUNT = 10;
 
-	private String urlToProcess;
-	private String destination;
-
-	public HtmlPageParser(String urlToProcess, String destination) {
-		this.urlToProcess = urlToProcess;
-		this.destination = destination;
+	public ImageDownloadManager() {
 	}
 
-	public void process() {
-
+	public void downloadImages(String url, String localRepo) {
 		try {
 			ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors
 					.newFixedThreadPool(MAX_MAIN_THREAD_POOL_COUNT);
 
-			WebClient webClient = new WebClient();
-			HtmlPage page = webClient.getPage(urlToProcess);
-			DomNodeList<HtmlElement> nodeList = page
-					.getElementsByTagName("img");
+			HtmlPageParser parser = new HtmlPageParser(url);
+			HtmlPage htmlPage = parser.parse();
 
 			logger.info(String.format("Initializing MessageMediator."));
 
 			MessageMediator mediator = new MessageMediator(
 					new ArrayBlockingQueue<String>(MAX_QUEUE_TASK));
 
-			// initialize the producer's input parameter
-			ImageUrlProducerParameter param = new ImageUrlProducerParameter();
-			param.setHtmlPage(page);
-			param.setNodeList(nodeList);
-
 			logger.info(String.format("Initializing Producers."));
 
 			// Currently, only one producer is supported. Having multiple
 			// producer will mess up the task pool
-			Future<?> producerFuture = pool.submit(new ImageUrlProducer(param,
-					mediator));
+			Future<?> producerFuture = pool.submit(new ImageUrlProducer(
+					htmlPage, mediator));
 
 			logger.info(String.format("Initializing Consumers."));
 
-			ImgMetadataDatabase imgDatabase = new ImgMetadataDatabase(
-					destination);
+			ImgMetadataDatabase imgDatabase = new ImgMetadataDatabase(localRepo);
 
 			// initialize our consumers
 			for (int i = 0; i < MAX_CONSUMER_COUNT; i++) {
 				pool.submit(new ImageUrlConsumer(mediator, imgDatabase));
 			}
 
+			// wait for the producer to finish
 			producerFuture.get();
 
 			logger.info(String
-					.format("Producer stopped producing, placing poison pill into the task queue"));
+					.format("Producer has stopped, placing poison pill into the task queue"));
+
+			// We delegate the 'poisoning' of the task queue here since the
+			// producer does not know how many consumers we have
 
 			// Producer has stopped producing task, poison the task queue to
-			// make shut down consumers.
+			// shut down consumers.
 
 			// Since we have MAX_CONSUMER_COUNT and each consumer would have
 			// popped the task, insert MAX_CONSUMER_COUNT of poison pills into
@@ -104,16 +95,11 @@ public class HtmlPageParser {
 			// to disk
 
 			pool.shutdown();
-			webClient.closeAllWindows();
+
 			imgDatabase.persistToDisk();
 
-			for (String url : mediator.getBackingQueue()) {
-				logger.info(String.format("Image at: %s", url));
-			}
-
 		} catch (Exception e) {
-			logger.fatal("Unable to complete operation due to: ", e);
+			logger.error("Unable to process request due to: ", e);
 		}
-
 	}
 }

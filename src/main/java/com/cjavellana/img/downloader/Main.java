@@ -29,10 +29,10 @@ public class Main {
 						"The location where grabbed images will be stored")
 				.create("dest");
 
-		HtmlPageParser parser = new HtmlPageParser(
+		ImageDownloadManager idm = new ImageDownloadManager();
+		idm.downloadImages(
 				"http://javarevisited.blogspot.sg/2012/02/producer-consumer-design-pattern-with.html",
 				"D:\\Temp\\downloaded_images");
-		parser.process();
 
 		logger.info(String.format("Image Downloader Ended at: %s",
 				DateFormatter.format(Calendar.getInstance().getTime())));

@@ -11,8 +11,8 @@ import javax.imageio.ImageIO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cjavellana.img.downloader.MessageMediator;
 import com.cjavellana.img.downloader.db.ImgMetadataDatabase;
+import com.cjavellana.img.downloader.mediator.MessageMediator;
 import com.cjavellana.img.downloader.util.CheckSumUtil;
 import com.cjavellana.img.downloader.util.ImageWriter;
 

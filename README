@@ -1,0 +1,28 @@
+Pre-requisites
+=========================================
+1. Apache maven 3.0.3 (I have not tested this using the previous version of maven)
+2. JDK 1.6.0_26 but JDK 1.5+ should be fine 
+3. 3rd Party libraries found in the pom.xml. Everything should be downloadable over the internet
+
+Design Patterns
+==========================================
+1. Producer - Consumer Design Pattern 
+   - Allows task processing as soon as it gets the the task queue.
+   - Producer blocks when the queue is full, consumer blocks when the queue is empty
+   - Does not depend on the task queue to be built first before consumer can do its work
+   
+2. Mediator Design Pattern - Facilitates the communication between the producer and the consumer
+   - Decouples the producer and the consumer. The one does not know the presence of the other.
+   
+Design Considerations
+===========================================
+
+1. The producer - consumer design pattern
+   The idea here is that, we would like to process the task as soon as it gets to the queue
+   
+2. Hashing Function
+   Used to determine whether an image has changed or not. In the future, the 
+   same hashing function can be used to determine whether 2 or more files of different file names 
+   are equally the same
+   
+   
