@@ -101,6 +101,8 @@ public class ImageDownloadManager {
 				mediator.put(MessageMediator.POISON_TASK);
 			}
 
+			logger.info(String.format("Waiting for consumers to shutdown"));
+
 			// wait for all consumers to finish
 			for (Future<?> future : consumerFutures) {
 				future.get();
@@ -110,10 +112,21 @@ public class ImageDownloadManager {
 
 			// clean up; Shutdown task pool, web client and store img database
 			// to disk
-
 			pool.shutdown();
 
-			imgDatabase.persistToDisk();
+			// ensure that pool is terminated before
+			// we write our database otherwise we would end up
+			// writing a partially filled database or an even an empty database
+			// this is because we write the database to disk before the consumer
+			// has placed the file's hash there
+			while (true) {
+				if (pool.isTerminated()) {
+					imgDatabase.persistToDisk();
+					break;
+				} else {
+					Thread.sleep(100);
+				}
+			}
 
 		} catch (Exception e) {
 			logger.error("Unable to process request due to: ", e);
