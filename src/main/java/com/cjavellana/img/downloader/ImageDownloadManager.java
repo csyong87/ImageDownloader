@@ -1,5 +1,8 @@
 package com.cjavellana.img.downloader;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,6 +49,12 @@ public class ImageDownloadManager {
 			ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors
 					.newFixedThreadPool(MAX_MAIN_THREAD_POOL_COUNT);
 
+			// check if local repo exist. If not, then create folder structure
+			File destinationFolder = new File(localRepo);
+			if (!destinationFolder.exists()) {
+				destinationFolder.mkdirs();
+			}
+
 			HtmlPageParser parser = new HtmlPageParser(url);
 			HtmlPage htmlPage = parser.parse();
 
@@ -63,11 +72,14 @@ public class ImageDownloadManager {
 
 			logger.info(String.format("Initializing Consumers."));
 
-			ImageMetadataDatabase imgDatabase = new ImageMetadataDatabase(localRepo);
+			ImageMetadataDatabase imgDatabase = new ImageMetadataDatabase(
+					localRepo);
 
 			// initialize our consumers
+			List<Future<?>> consumerFutures = new ArrayList<Future<?>>();
 			for (int i = 0; i < MAX_CONSUMER_COUNT; i++) {
-				pool.submit(new ImageUrlConsumer(mediator, imgDatabase));
+				consumerFutures.add(pool.submit(new ImageUrlConsumer(mediator,
+						imgDatabase)));
 			}
 
 			// wait for the producer to finish
@@ -87,6 +99,11 @@ public class ImageDownloadManager {
 			// the task queue
 			for (int i = 0; i < MAX_CONSUMER_COUNT; i++) {
 				mediator.put(MessageMediator.POISON_TASK);
+			}
+
+			// wait for all consumers to finish
+			for (Future<?> future : consumerFutures) {
+				future.get();
 			}
 
 			logger.info(String.format("Shutting down task pool"));

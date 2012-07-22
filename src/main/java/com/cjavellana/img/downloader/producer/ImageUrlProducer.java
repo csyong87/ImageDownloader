@@ -55,7 +55,7 @@ public class ImageUrlProducer implements Runnable {
 		try {
 			DomNodeList<HtmlElement> nodeList = htmlPage
 					.getElementsByTagName(HTML_IMG_TAG);
-
+			
 			for (HtmlElement imgTask : nodeList) {
 				URL pageUrl = htmlPage.getUrl();
 				String imgSrc = imgTask.getAttribute(HTML_SRC_ATTR);
@@ -78,7 +78,7 @@ public class ImageUrlProducer implements Runnable {
 					// http://google.com/images/july2012/images.html
 					// The image url would be interpreted as
 					// http://google.com/images/july2012/email_icon.jpg
-					imageUrl = String.format("%s%s", pageUrl.toString()
+					imageUrl = String.format("%s/%s", pageUrl.toString()
 							.substring(0, pageUrl.toString().lastIndexOf("/")),
 							imgSrc);
 				}
