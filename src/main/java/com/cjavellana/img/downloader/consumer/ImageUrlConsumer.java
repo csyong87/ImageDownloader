@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cjavellana.img.downloader.db.ImgMetadataDatabase;
+import com.cjavellana.img.downloader.db.ImageMetadataDatabase;
 import com.cjavellana.img.downloader.mediator.MessageMediator;
 import com.cjavellana.img.downloader.util.CheckSumUtil;
 import com.cjavellana.img.downloader.util.ImageWriter;
@@ -28,10 +28,10 @@ public class ImageUrlConsumer implements Runnable {
 
 	private MessageMediator mediator;
 	private String destination;
-	private ImgMetadataDatabase imgDatabase;
+	private ImageMetadataDatabase imgDatabase;
 
 	public ImageUrlConsumer(MessageMediator mediator,
-			ImgMetadataDatabase imgDatabase) {
+			ImageMetadataDatabase imgDatabase) {
 		this.mediator = mediator;
 		this.destination = imgDatabase.getDestDirectory();
 		this.imgDatabase = imgDatabase;
@@ -85,11 +85,11 @@ public class ImageUrlConsumer implements Runnable {
 						ByteArrayOutputStream os = new ByteArrayOutputStream();
 						ImageIO.write(img, ext, os);
 
-						String md5Hash = CheckSumUtil.getMD5Checksum(os
+						String checksum = CheckSumUtil.getChecksum(os
 								.toByteArray());
 
 						logger.info(String.format("File: %s; SHA-256 Hash: %s",
-								newFilename, md5Hash));
+								newFilename, checksum));
 
 						// Get checksum of the image from the previous run
 						String previousChecksum = imgDatabase.get(newFilename);
@@ -97,7 +97,7 @@ public class ImageUrlConsumer implements Runnable {
 						// if this is a new image or image has changed
 						// update the image in the dest directory
 						if (previousChecksum == null
-								|| !previousChecksum.equalsIgnoreCase(md5Hash)) {
+								|| !previousChecksum.equalsIgnoreCase(checksum)) {
 							logger.info(String.format(
 									"File %s has changed; Updating Images...",
 									newFilename));
@@ -107,7 +107,7 @@ public class ImageUrlConsumer implements Runnable {
 							ImageWriter.writeImage(img, destination,
 									newFilename);
 							// store the image
-							imgDatabase.put(newFilename, md5Hash);
+							imgDatabase.put(newFilename, checksum);
 						} else {
 							logger.info(String.format(
 									"File %s has not changed", newFilename));

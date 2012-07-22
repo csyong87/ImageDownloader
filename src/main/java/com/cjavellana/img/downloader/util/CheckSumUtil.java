@@ -37,7 +37,7 @@ public class CheckSumUtil {
 
 	// see this How-to for a faster way to convert
 	// a byte array to a HEX string
-	public static String getMD5Checksum(byte[] imageData) throws Exception {
+	public static String getChecksum(byte[] imageData) throws Exception {
 		byte[] b = createChecksum(imageData);
 		String result = "";
 

@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Christian
  * 
  */
-public class ImgMetadataDatabase implements Serializable {
+public class ImageMetadataDatabase implements Serializable {
 
 	/**
 	 * 
@@ -27,13 +27,13 @@ public class ImgMetadataDatabase implements Serializable {
 	private static final long serialVersionUID = 3013637184924085601L;
 
 	private static final Log logger = LogFactory
-			.getLog(ImgMetadataDatabase.class);
+			.getLog(ImageMetadataDatabase.class);
 
 	private static final String IMG_DB_FILENAME = "/img.dat";
 	private Map<String, String> map;
 	private String destDirectory;
 
-	public ImgMetadataDatabase(String imgDirectory) {
+	public ImageMetadataDatabase(String imgDirectory) {
 		try {
 			this.destDirectory = imgDirectory;
 			FileInputStream fis = new FileInputStream(imgDirectory

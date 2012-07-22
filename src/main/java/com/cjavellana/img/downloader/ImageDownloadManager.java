@@ -9,7 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cjavellana.img.downloader.consumer.ImageUrlConsumer;
-import com.cjavellana.img.downloader.db.ImgMetadataDatabase;
+import com.cjavellana.img.downloader.db.ImageMetadataDatabase;
 import com.cjavellana.img.downloader.html.HtmlPageParser;
 import com.cjavellana.img.downloader.mediator.MessageMediator;
 import com.cjavellana.img.downloader.producer.ImageUrlProducer;
@@ -63,7 +63,7 @@ public class ImageDownloadManager {
 
 			logger.info(String.format("Initializing Consumers."));
 
-			ImgMetadataDatabase imgDatabase = new ImgMetadataDatabase(localRepo);
+			ImageMetadataDatabase imgDatabase = new ImageMetadataDatabase(localRepo);
 
 			// initialize our consumers
 			for (int i = 0; i < MAX_CONSUMER_COUNT; i++) {
