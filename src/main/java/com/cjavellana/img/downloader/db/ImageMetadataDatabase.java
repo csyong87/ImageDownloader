@@ -72,7 +72,7 @@ public class ImageMetadataDatabase implements Serializable {
 	 * @param value
 	 */
 	public void put(String key, String value) {
-		synchronized (map) {
+		synchronized (this) {
 			map.put(key, value);
 		}
 	}

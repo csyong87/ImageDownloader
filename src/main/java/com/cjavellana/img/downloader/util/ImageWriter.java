@@ -37,7 +37,7 @@ public class ImageWriter {
 			ImageIO.write(image100px, "png", new File(destination + "/"
 					+ filename100px + ".png"));
 
-			// resize width to 100px and scale the height
+			// resize width to 220px and scale the height
 			BufferedImage image220px = (BufferedImage) ImageUtil.resizeImage(
 					originalImage, IMG_SIZE_220PX,
 					getScaledHeight(originalImage, IMG_SIZE_220PX));
@@ -48,7 +48,7 @@ public class ImageWriter {
 			ImageIO.write(image220px, "png", new File(destination + "/"
 					+ filename220px + ".png"));
 
-			// resize width to 100px and scale the height
+			// resize width to 320px and scale the height
 			BufferedImage image320px = (BufferedImage) ImageUtil.resizeImage(
 					originalImage, IMG_SIZE_320PX,
 					getScaledHeight(originalImage, IMG_SIZE_320PX));

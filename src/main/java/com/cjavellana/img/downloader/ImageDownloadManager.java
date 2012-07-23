@@ -121,6 +121,7 @@ public class ImageDownloadManager {
 			// has placed the file's hash there
 			while (true) {
 				if (pool.isTerminated()) {
+					logger.info(String.format("Saving database to disk"));
 					imgDatabase.persistToDisk();
 					break;
 				} else {

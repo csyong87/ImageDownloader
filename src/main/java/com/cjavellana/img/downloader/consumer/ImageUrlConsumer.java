@@ -88,19 +88,17 @@ public class ImageUrlConsumer implements Runnable {
 						String checksum = CheckSumUtil.getChecksum(os
 								.toByteArray());
 
-						logger.info(String.format("File: %s; SHA-256 Hash: %s",
-								newFilename, checksum));
-
 						// Get checksum of the image from the previous run
 						String previousChecksum = imgDatabase.get(newFilename);
+
+						logger.info(String
+								.format("File: %s; Previous Hash: %s; Current Hash: %s",
+										newFilename, previousChecksum, checksum));
 
 						// if this is a new image or image has changed
 						// update the image in the dest directory
 						if (previousChecksum == null
 								|| !previousChecksum.equalsIgnoreCase(checksum)) {
-							logger.info(String.format(
-									"File %s has changed; Updating Images...",
-									newFilename));
 
 							// Create image with sizes of 100px, 220px, and
 							// 320px

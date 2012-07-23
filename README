@@ -1,9 +1,34 @@
 Pre-requisites
 =========================================
 1. Apache maven 3.0.3 (I have not tested this using the previous version of maven)
-2. JDK 1.6.0_26 but JDK 1.5+ should be fine 
+2. JDK 1.6.0_26. Not tested on jdk 1.5
 3. 3rd Party libraries found in the pom.xml. Everything should be downloadable over the internet
 
+Compiling the program using maven
+=========================================
+1. Navigate to the project's root directory (where the pom file is located)
+   and execute mvn clean package
+2. After the program has been compiled
+3. A jar file with dependencies is placed into the bin directory.
+
+How to Use
+=========================================
+1. Using a terminal (command line), Navigate bin directory
+2. Type java -jar ImageDownloader_1.0-jar-with-dependencies.jar -url <target url> -dest <target local directory>
+   
+   Example:
+   
+   On Windows Machines
+   java -jar ImageDownloader_1.0-jar-with-dependencies.jar -url http://yahoo.com -dest D:\\Temp\\yahoo
+	
+   On Unix / Linux based Machines
+   java -jar ImageDownloader_1.0-jar-with-dependencies.jar -url http://yahoo.com -dest /home/username/downloaded/yahoo
+	
+   Note: When running on Microsoft windows maching and using the backslash (\) directory separator, it 
+         is important to escape the backslash character by adding another backslash before it. 
+         
+         Example: D:\\Downloaded\\Images\\Yahoo 
+          
 Design Patterns
 ==========================================
 1. Producer - Consumer Design Pattern 
@@ -24,5 +49,18 @@ Design Considerations
    Used to determine whether an image has changed or not. In the future, the 
    same hashing function can be used to determine whether 2 or more files of different file names 
    are equally the same
-   
-   
+
+Things that can be improved given more time
+============================================
+1. Integrate JUnit Test
+
+2. Enhance the program to support downloading from multiple urls
+
+3. Refactor ImageWriter to make it more flexible. Probably introduce an xml based configuration file for 
+   image writer to have it only refer to that xml configuration file to determine which sizes an image should 
+   be scaled to and to which format.
+
+Other considerations
+=============================================
+1. Does not work behind proxies
+
