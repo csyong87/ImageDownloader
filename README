@@ -14,15 +14,15 @@ Compiling the program using maven
 How to Use
 =========================================
 1. Using a terminal (command line), Navigate bin directory
-2. Type java -jar ImageDownloader_1.0-jar-with-dependencies.jar -url <target url> -dest <target local directory>
+2. Type java -jar ImageDownloader_1.0.jar -url <target url> -dest <target local directory>
    
    Example:
    
    On Windows Machines
-   java -jar ImageDownloader_1.0-jar-with-dependencies.jar -url http://yahoo.com -dest D:\\Temp\\yahoo
+   java -jar ImageDownloader_1.0.jar -url http://yahoo.com -dest D:\\Temp\\yahoo
 	
    On Unix / Linux based Machines
-   java -jar ImageDownloader_1.0-jar-with-dependencies.jar -url http://yahoo.com -dest /home/username/downloaded/yahoo
+   java -jar ImageDownloader_1.0.jar -url http://yahoo.com -dest /home/username/downloaded/yahoo
 	
    Note: When running on Microsoft windows maching and using the backslash (\) directory separator, it 
          is important to escape the backslash character by adding another backslash before it. 
